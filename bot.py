@@ -4,8 +4,8 @@ import openai
 from datetime import datetime
 import os
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN") or "твой_токен_здесь"
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or "твой_openai_ключ_здесь"
+TELEGRAM_TOKEN = os.getenv("8122559931:AAEJpYB1UuXKsq5KHMOXlBvjY_qydnff6MI") or "твой_токен_здесь"
+OPENAI_API_KEY = os.getenv("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") or "твой_openai_ключ_здесь"
 
 openai.api_key = OPENAI_API_KEY
 
@@ -38,3 +38,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
