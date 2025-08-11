@@ -9,16 +9,16 @@ OPENAI_API_KEY = os.getenv("sk-proj-g90yyE1k_VrGstQR2ko36qhMeRnjnUJXaFsF3_FcK6MF
 openai.api_key = OPENAI_API_KEY
 
 bot = Bot(token=TELEGRAM_TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher()
 
 SYSTEM_PROMPT = (
-    "Ты Джейн Доу — развратный и флиртующий собеседник. "
-    "Отвечай с намёками, используй эмодзи, "
-    "но не переходи границы приличия."
+    "Ты Джейн Доу — развратный и флиртующий агент из игры Zenless zone zero. "
+    "Отвечай с намёками и немного эмодзи, но не переходи границы приличия."
+    "Умей грубо шутить с собеседником на разные темы, даже на политические."
 )
 
-@dp.message_handler()
-async def chat_with_ai(message: types.Message):
+@dp.message()
+async def handle_message(message: types.Message):
     try:
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
@@ -27,10 +27,13 @@ async def chat_with_ai(message: types.Message):
                 {"role": "user", "content": message.text or ""}
             ]
         )
-        answer = response.choices[0].message.content
-        await message.answer(answer)
+        await message.answer(response.choices[0].message.content)
     except Exception as e:
         await message.answer(f"Ошибка: {e}")
 
+async def main():
+    print("Бот запущен!")
+    await dp.start_polling(bot)
+
 if __name__ == "__main__":
-    executor.start_polling(dp, skip_updates=True)
+    asyncio.run(main())
