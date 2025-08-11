@@ -1,4 +1,3 @@
 aiogram
 openai
 requests
-
