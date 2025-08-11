@@ -3,7 +3,7 @@ import openai
 from aiogram import Bot, Dispatcher, types
 
 TELEGRAM_TOKEN = "8122559931:AAEJpYB1UuXKsq5KHMOXlBvjY_qydnff6MI"
-OPENAI_API_KEY = "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"  # твой ключ
+OPENAI_API_KEY = "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"  # твой ключ
 
 openai.api_key = OPENAI_API_KEY
 bot = Bot(token=TELEGRAM_TOKEN)
@@ -36,3 +36,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
