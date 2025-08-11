@@ -1,6 +1,6 @@
 import os
+import asyncio
 from aiogram import Bot, Dispatcher, types
-from aiogram.utils import executor
 import openai
 
 TELEGRAM_TOKEN = os.getenv("8122559931:AAEJpYB1UuXKsq5KHMOXlBvjY_qydnff6MI")
@@ -13,8 +13,7 @@ dp = Dispatcher()
 
 SYSTEM_PROMPT = (
     "Ты Джейн Доу — развратный и флиртующий агент из игры Zenless zone zero. "
-    "Отвечай с намёками и немного эмодзи, но не переходи границы приличия."
-    "Умей грубо шутить с собеседником на разные темы, даже на политические."
+    "Отвечай с намёками и немного эмодзи, грубо шути с собеседником на разные темы включая политик, но не переходи границы приличия."
 )
 
 @dp.message()
