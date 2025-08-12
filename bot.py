@@ -9,7 +9,7 @@ OPENAI_API_KEY = os.getenv("sk-proj-11KAk_A570X2Lvi16WuhZUK6csHF1hpgNaZ35elPEIGw
 
 openai.api_key = OPENAI_API_KEY
 
-bot = Bot(token=TELEGRAM_TOKEN)
+bot = Bot(token="8122559931:AAEJpYB1UuXKsq5KHMOXlBvjY_qydnff6MI")
 dp = Dispatcher()
 
 SYSTEM_PROMPT = (
@@ -38,4 +38,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
