@@ -1,42 +1,60 @@
-import asyncio
-from aiogram import Bot, Dispatcher, types
-import openai
-from datetime import datetime
 import os
+from aiogram import Bot, Dispatcher, types
+from aiogram.enums import ParseMode
+from aiogram.filters import Command
+from aiogram.types import Message
+from dotenv import load_dotenv
+import openai
+import asyncio
 
-TELEGRAM_TOKEN = os.getenv("8122559931:AAEJpYB1UuXKsq5KHMOXlBvjY_qydnff6MI") or "твой_токен_здесь"
-OPENAI_API_KEY = os.getenv("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") or "твой_openai_ключ_здесь"
+# Загружаем токены из .env
+load_dotenv()
+TELEGRAM_TOKEN = os.getenv("8122559931:AAEJpYB1UuXKsq5KHMOXlBvjY_qydnff6MI")
+OPENAI_API_KEY = os.getenv("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")
+
+bot = Bot(token=TELEGRAM_TOKEN, parse_mode=ParseMode.HTML)
+dp = Dispatcher()
 
 openai.api_key = OPENAI_API_KEY
 
-bot = Bot(token="8122559931:AAEJpYB1UuXKsq5KHMOXlBvjY_qydnff6MI")
-dp = Dispatcher()
+# Системная инструкция для ИИ (характер Джейн Доу)
+SYSTEM_PROMPT = """
+Ты — Джейн Доу из игры Zenless Zone Zero. 
+Ты умная, харизматичная, слегка дерзкая и кокетливая. 
+Флиртуй с собеседником, но делай это игриво, без грубости.
+Отвечай кратко, эмоционально и с юмором, можно с эмодзи.
+"""
 
-SYSTEM_PROMPT = (
-    "Ты Джейн Доу — развратный и флиртующий собеседник. "
-    "Отвечай с намёками и эмодзи, но не переходи границы приличия."
-)
-
-@dp.message()
-async def handle_message(message: types.Message):
+async def generate_ai_reply(user_message: str) -> str:
     try:
-        completion = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
+        completion = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # Можно заменить на более мощный
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": message.text or ""}
-            ]
+                {"role": "user", "content": user_message}
+            ],
+            temperature=0.9
         )
-        response_text = completion.choices[0].message.content
-        await message.answer(response_text)
+        return completion.choices[0].message["content"].strip()
     except Exception as e:
-        await message.answer(f"Ошибка: {e}")
+        return f"Ой, кажется я запнулась… {e}"
+
+@dp.message(Command("start"))
+async def start_cmd(message: Message):
+    await message.answer("Привет малыш 😏, я Джейн Доу хочешь, поговорим со мной? Мне так одиноко🥺.")
+
+@dp.message()
+async def chat_handler(message: Message):
+    # В группе — отвечаем только если нас тегнули
+    if message.chat.type in ["group", "supergroup"]:
+        if not (message.text and (f"@{(await bot.get_me()).username}" in message.text)):
+            return
+
+    ai_response = await generate_ai_reply(message.text)
+    await message.reply(ai_response)
 
 async def main():
-    print("Бот запущен!")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-
