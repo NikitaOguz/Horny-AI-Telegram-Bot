@@ -1,9 +1,10 @@
 import os
+import random
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart
 from aiogram import F
 from openai import OpenAI
-import random
+from gtts import gTTS
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -24,21 +25,27 @@ async def start(message: types.Message):
 
 @dp.message(F.text)
 async def chat(message: types.Message):
-    prompt = f"Ты агент Джейн Доу из игры Zenless zone zero, отвечай на сообщение пользователя в стиле флиртующего собеседника с грубым чувством юмора. Сообщение пользователя: {message.text}"
     try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "Ты агент Джейн Доу из игры Zenless zone zero, пошлый, флиртующий собеседник с намёками и немного эмодзи, который может подсказать гайд в игре."},
+                {"role": "system", "content": "Ты агент Джейн Доу из игры Zenless Zone Zero, пошлый, флиртующий собеседник с намёками и немного эмодзи, который может подсказать гайд в игре."},
                 {"role": "user", "content": message.text}
             ],
             max_tokens=300,
             temperature=0.9,
         )
         reply = response.choices[0].message.content
+
+        # Отправляем текст
         await message.answer(reply)
 
-        # С шансом 30% отправляем гифку
+        # 🎙 Генерация голосового сообщения
+        tts = gTTS(reply, lang="ru")
+        tts.save("voice.ogg")
+        await bot.send_voice(message.chat.id, voice=open("voice.ogg", "rb"))
+
+        # 🎞 Иногда отправляем гифку
         if random.random() < 0.3:
             gif_url = random.choice(GIFS)
             await bot.send_animation(message.chat.id, gif_url)
