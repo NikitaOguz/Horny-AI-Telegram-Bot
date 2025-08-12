@@ -3,7 +3,7 @@ import random
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart
 from aiogram import F
-from aiogram.types import InputFile
+from aiogram.types import FSInputFile
 from openai import OpenAI
 from gtts import gTTS
 
@@ -44,7 +44,7 @@ async def chat(message: types.Message):
         # 🎙 Генерация голосового сообщения
         tts = gTTS(reply, lang="ru")
         tts.save("voice.ogg")
-        voice = InputFile("voice.ogg")
+        voice = FSInputFile("voice.ogg")
         await bot.send_voice(message.chat.id, voice=voice)
 
         # 🎞 Иногда отправляем гифку
@@ -58,3 +58,4 @@ async def chat(message: types.Message):
 if __name__ == "__main__":
     import asyncio
     asyncio.run(dp.start_polling(bot))
+
