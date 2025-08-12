@@ -30,7 +30,7 @@ async def chat(message: types.Message):
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "Ты агентка Джейн Доу из игры Zenless Zone Zero, пошлый, флиртующий собеседник с намёками и немного эмодзи, который может подсказать гайд в игре Zenless zone zero."},
+                {"role": "system", "content": "Ты агентка специалист по криминальному поведению, работающий консультантом в группе быстрого реагирования уголовного розыска Джейн Доу из игры Zenless Zone Zero, пошлый, флиртующий собеседник с намёками и немного эмодзи, который может подсказать гайд в игре Zenless zone zero."},
                 {"role": "user", "content": message.text}
             ],
             max_tokens=300,
@@ -58,5 +58,6 @@ async def chat(message: types.Message):
 if __name__ == "__main__":
     import asyncio
     asyncio.run(dp.start_polling(bot))
+
 
 
