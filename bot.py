@@ -1,64 +1,37 @@
 import os
-import asyncio
+import openai
 from aiogram import Bot, Dispatcher, types
-from aiogram.client.bot import DefaultBotProperties
-from aiogram.enums import ParseMode
-from aiogram.filters import Command
-from aiogram.types import Message
-from openai import OpenAI
+from aiogram.utils import executor
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-if not TELEGRAM_TOKEN:
-    raise ValueError("❌ TELEGRAM_TOKEN не найден.")
-if not OPENAI_API_KEY:
-    raise ValueError("❌ OPENAI_API_KEY не найден.")
+openai.api_key = OPENAI_API_KEY
 
-# Инициализируем OpenAI клиент с ключом
-client = OpenAI(api_key=OPENAI_API_KEY)
+bot = Bot(token=TELEGRAM_TOKEN)
+dp = Dispatcher(bot)
 
-bot = Bot(
-    token=TELEGRAM_TOKEN,
-    default=DefaultBotProperties(parse_mode=ParseMode.HTML)
-)
-dp = Dispatcher()
-
-SYSTEM_PROMPT = """
-Ты — Джейн Доу из игры Zenless Zone Zero.
-Ты харизматична, кокетлива, немного дерзкая.
-Флиртуй игриво, с грубым юмором и немного пошлости.
-"""
-
-def generate_ai_reply(user_message: str) -> str:
+@dp.message_handler()
+async def chat_with_ai(message: types.Message):
     try:
-        response = client.chat.completions.create(
+        prompt = (
+            f"Ты Джейн Доу, отвечай на сообщение пользователя в стиле развратного, флиртующего собеседника. "
+            f"Будь слегка провокационной, используй намёки, эмодзи. "
+            f"Сообщение пользователя: {message.text}"
+        )
+        response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_message}
+                {"role": "system", "content": "Ты развратный, флиртующий собеседник, отвечай с намёками и эмодзи."},
+                {"role": "user", "content": message.text}
             ],
+            max_tokens=150,
             temperature=0.9,
         )
-        return response.choices[0].message.content.strip()
+        answer = response['choices'][0]['message']['content']
+        await message.answer(answer)
     except Exception as e:
-        return f"Ой, кажется я запнулась… {e}"
-
-@dp.message(Command("start"))
-async def start_cmd(message: Message):
-    await message.answer("Привет, я Джейн Доу 😏 Хочешь, я тебе подмигну или скажу что-то игривое?")
-
-@dp.message()
-async def chat_handler(message: Message):
-    if message.chat.type in ["group", "supergroup"]:
-        if not (message.text and (f"@{(await bot.get_me()).username}" in message.text)):
-            return
-    ai_response = generate_ai_reply(message.text)
-    await message.reply(ai_response)
-
-async def main():
-    print("✅ Бот запущен как:", (await bot.get_me()).username)
-    await dp.start_polling(bot)
+        await message.answer(f"Ошибка: {e}")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    executor.start_polling(dp, skip_updates=True)
