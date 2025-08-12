@@ -5,7 +5,7 @@ from aiogram.client.bot import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
 from aiogram.types import Message
-import openai
+from openai import OpenAI
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -15,7 +15,8 @@ if not TELEGRAM_TOKEN:
 if not OPENAI_API_KEY:
     raise ValueError("❌ OPENAI_API_KEY не найден.")
 
-openai.api_key = OPENAI_API_KEY
+# Инициализируем OpenAI клиент с ключом
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 bot = Bot(
     token=TELEGRAM_TOKEN,
@@ -25,13 +26,13 @@ dp = Dispatcher()
 
 SYSTEM_PROMPT = """
 Ты — Джейн Доу из игры Zenless Zone Zero.
-Ты харизматична, кокетлива, немного дерзкая и можешь дать совет в игре.
+Ты харизматична, кокетлива, немного дерзкая.
 Флиртуй игриво, с грубым юмором и немного пошлости.
 """
 
-async def generate_ai_reply(user_message: str) -> str:
+def generate_ai_reply(user_message: str) -> str:
     try:
-        response = await openai.ChatCompletion.acreate(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
@@ -52,7 +53,7 @@ async def chat_handler(message: Message):
     if message.chat.type in ["group", "supergroup"]:
         if not (message.text and (f"@{(await bot.get_me()).username}" in message.text)):
             return
-    ai_response = await generate_ai_reply(message.text)
+    ai_response = generate_ai_reply(message.text)
     await message.reply(ai_response)
 
 async def main():
