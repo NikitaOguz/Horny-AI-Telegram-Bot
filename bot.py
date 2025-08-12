@@ -13,11 +13,11 @@ dp = Dispatcher()
 
 @dp.message(CommandStart())
 async def start(message: types.Message):
-    await message.answer("Привет 😏 Я твой развратный собеседник. Напиши что-нибудь...")
+    await message.answer("Привет 😏 Я Джейн Доу. Готова с тобой поболтать, ты не против?")
 
 @dp.message(F.text)
 async def chat(message: types.Message):
-    prompt = f"Отвечай на сообщение пользователя в стиле развратного, флиртующего собеседника. Сообщение пользователя: {message.text}"
+    prompt = f"Ты агент Джейн Доу из игры Zenless zone zero, отвечай на сообщение пользователя в стиле флиртующего собеседника с грубыи чувством юмора. Сообщение пользователя: {message.text}"
     try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
@@ -36,3 +36,4 @@ async def chat(message: types.Message):
 if __name__ == "__main__":
     import asyncio
     asyncio.run(dp.start_polling(bot))
+
