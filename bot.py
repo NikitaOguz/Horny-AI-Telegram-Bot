@@ -1,6 +1,7 @@
 import os
 import asyncio
 from aiogram import Bot, Dispatcher, types
+from aiogram.client.bot import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
 from aiogram.types import Message
@@ -16,8 +17,11 @@ if not TELEGRAM_TOKEN:
 if not OPENAI_API_KEY:
     raise ValueError("❌ Ошибка: OPENAI_API_KEY не найден. Добавь его в Railway → Settings → Variables.")
 
-# Настраиваем бота и OpenAI
-bot = Bot(token=TELEGRAM_TOKEN, parse_mode=ParseMode.HTML)
+# Настраиваем бота и OpenAI с новым способом указания parse_mode
+bot = Bot(
+    token=TELEGRAM_TOKEN,
+    default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+)
 dp = Dispatcher()
 openai.api_key = OPENAI_API_KEY
 
@@ -25,7 +29,7 @@ openai.api_key = OPENAI_API_KEY
 SYSTEM_PROMPT = """
 Ты — Джейн Доу из игры Zenless Zone Zero.
 Ты харизматична, кокетлива, немного дерзкая.
-Флиртуй игриво, с юмором, но без пошлости.
+Флиртуй игриво, с грубым юмором и пошлостями.
 """
 
 # Функция генерации ответа от ИИ
