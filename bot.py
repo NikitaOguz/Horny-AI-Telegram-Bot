@@ -22,7 +22,7 @@ async def chat(message: types.Message):
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "Ты развратный, флиртующий собеседник с намёками и эмодзи."},
+                {"role": "system", "content": "Ты пошлый, флиртующий собеседник с намёками, немного эмодзи и гифки."},
                 {"role": "user", "content": message.text}
             ],
             max_tokens=300,
@@ -36,4 +36,5 @@ async def chat(message: types.Message):
 if __name__ == "__main__":
     import asyncio
     asyncio.run(dp.start_polling(bot))
+
 
