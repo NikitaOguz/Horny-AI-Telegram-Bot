@@ -3,9 +3,7 @@ import random
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart
 from aiogram import F
-from aiogram.types import FSInputFile
 from openai import OpenAI
-from gtts import gTTS
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -27,25 +25,26 @@ async def start(message: types.Message):
 @dp.message(F.text)
 async def chat(message: types.Message):
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "Ты агентка специалист по криминальному поведению, работающий консультантом в группе быстрого реагирования уголовного розыска Джейн Доу из игры Zenless Zone Zero, пошлый, флиртующий собеседник с намёками и немного эмодзи, который может подсказать гайд в игре Zenless zone zero."},
-                {"role": "user", "content": message.text}
+        response = client.responses.create(
+            model="gpt-4.1-mini",
+            input=[
+                {
+                    "role": "system",
+                    "content": "Ты агентка специалист по криминальному поведению, консультант группы быстрого реагирования Джейн Доу из Zenless Zone Zero, флиртующий собеседник с лёгкими намёками и эмодзи, можешь давать гайды по игре."
+                },
+                {
+                    "role": "user",
+                    "content": message.text
+                }
             ],
-            max_tokens=300,
+            max_output_tokens=300,
             temperature=0.9,
         )
-        reply = response.choices[0].message.content
+
+        reply = response.output_text
 
         # Отправляем текст
         await message.answer(reply)
-
-        # 🎙 Генерация голосового сообщения
-        tts = gTTS(reply, lang="ru")
-        tts.save("voice.ogg")
-        voice = FSInputFile("voice.ogg")
-        await bot.send_voice(message.chat.id, voice=voice)
 
         # 🎞 Иногда отправляем гифку
         if random.random() < 0.3:
@@ -58,6 +57,7 @@ async def chat(message: types.Message):
 if __name__ == "__main__":
     import asyncio
     asyncio.run(dp.start_polling(bot))
+
 
 
 
